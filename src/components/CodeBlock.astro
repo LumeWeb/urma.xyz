@@ -11,11 +11,11 @@ const { filename, language, code } = Astro.props;
 <div class="code-block my-8 group">
   <div class="code-block-header">
     {filename && (
-      <span class="label-caps text-[var(--color-muted)]">{filename}</span>
+      <span class="label-caps text-muted">{filename}</span>
     )}
     {!filename && <span></span>}
     <button
-      class="copy-btn text-[var(--color-muted)] hover:text-[var(--color-paper)] transition-colors opacity-0 group-hover:opacity-100"
+      class="copy-btn text-muted hover:text-paper transition-colors opacity-0 group-hover:opacity-100"
       title="Copy code"
       aria-label="Copy code"
     >
