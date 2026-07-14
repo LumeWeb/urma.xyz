@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://go.lumeweb.com/urma/sia/manifest",
+  "properties": {
+    "streamName": {
+      "type": "string",
+      "description": "Original stream name"
+    },
+    "streamType": {
+      "type": "string",
+      "description": "LBRY stream type"
+    },
+    "suggestedFileName": {
+      "type": "string",
+      "description": "Suggested file name"
+    },
+    "blobs": {
+      "items": {
+        "properties": {
+          "blobHash": {
+            "type": "string",
+            "description": "SHA-384 hash of encrypted blob (hex)"
+          },
+          "iv": {
+            "type": "string",
+            "description": "AES IV for blob content (hex)"
+          },
+          "blobLength": {
+            "type": "integer",
+            "description": "LBRY blob size in bytes"
+          },
+          "blobNum": {
+            "type": "integer",
+            "description": "Position in stream (0-indexed)"
+          },
+          "slabKey": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 32,
+            "minItems": 32,
+            "description": "Sia slab encryption key"
+          },
+          "minShards": {
+            "type": "integer",
+            "description": "Minimum sectors for recovery"
+          },
+          "sectors": {
+            "items": {
+              "properties": {
+                "root": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array",
+                  "maxItems": 32,
+                  "minItems": 32
+                },
+                "hostKey": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array",
+                  "maxItems": 32,
+                  "minItems": 32
+                }
+              },
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "root",
+                "hostKey"
+              ]
+            },
+            "type": "array",
+            "description": "Pinned sectors for this blob"
+          },
+          "slabOffset": {
+            "type": "integer",
+            "description": "Byte offset into slab data"
+          },
+          "slabLength": {
+            "type": "integer",
+            "description": "Number of data bytes in slab slice"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "blobHash",
+          "iv",
+          "blobLength",
+          "blobNum",
+          "slabKey",
+          "minShards",
+          "sectors",
+          "slabOffset",
+          "slabLength"
+        ]
+      },
+      "type": "array",
+      "description": "Blob entries mapping LBRY blob hashes to Sia locations"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "streamName",
+    "streamType",
+    "suggestedFileName",
+    "blobs"
+  ]
+}

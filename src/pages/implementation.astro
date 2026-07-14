@@ -1,0 +1,163 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import Callout from "../components/Callout.astro";
+
+const installCode = `go get go.lumeweb.com/urma`;
+
+const encodeCode = [
+  'import "go.lumeweb.com/urma"',
+  "",
+  "claim := urma.UrmaClaim{",
+  "    Version:       0,",
+  '    Location:      "sia",  // backend-specific identifier',
+  "    SourceClaimID: decodeHex(\"a1b2c3d4e5f60102030405060708090a0b0c0d0e\"),",
+  "    DataKey:       [32]byte{66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},",
+  "    LocationData:  rootLocationData,  // backend-specific opaque JSON",
+  "}",
+  "",
+  "// Encode to JSON (validates size budget)",
+  "jsonBytes, err := urma.EncodeClaim(claim)",
+  "if err != nil {",
+  "    log.Fatal(err)",
+  "}",
+  "",
+  "// Wrap in unsigned envelope for global Urma",
+  "envelope := urma.EncodeUnsignedEnvelope(jsonBytes)",
+  "",
+  "// Or wrap in signed envelope for creator-owned Urma",
+  "// signedEnv, err := urma.EncodeSignedEnvelope(jsonBytes, channelClaimID, privKey, txInput0Hash)",
+].join("\n");
+
+const decodeCode = [
+  "// rawValue is the claim value bytes from getclaimsforname",
+  "claimJSON, version, channelClaimID, signature, err := urma.DecodeEnvelope(rawValue)",
+  "if err != nil {",
+  "    // Invalid envelope: skip this claim",
+  "    return",
+  "}",
+  "",
+  "claim, err := urma.DecodeClaim(claimJSON)",
+  "if err != nil {",
+  "    return",
+  "}",
+  "",
+  "// Verify sourceClaimId matches expected value",
+  "if claim.SourceClaimID != expectedClaimID {",
+  "    return // mismatched claim",
+  "}",
+  "",
+  "// For signed envelopes, verify the channel signature",
+  "if version == urma.EnvelopeSigned {",
+  "    if err := urma.VerifySignedEnvelope(rawValue, txInput0Hash, channelPubKey); err != nil {",
+  "        return // invalid signature",
+  "    }",
+  "}",
+  "",
+  "// Fetch root locationData from storage backend",
+  "// Then follow the manifest page chain to collect all blobs",
+].join("\n");
+
+const backendCode = [
+  "// 1. Choose a location identifier string",
+  'const LocationMyBackend = "mybackend"',
+  "",
+  "// 2. Define the locationData schema for the root pointer",
+  "//    This is opaque JSON: whatever your backend needs to find the first manifest page",
+  "type MyBackendLocationData struct {",
+  "    // e.g. a CID, a URL, a slab slice, etc.",
+  "}",
+  "",
+  "// 3. Define manifest page payload types",
+  "type MyBackendManifest struct {",
+  "    // Blob entries, stream metadata, etc.",
+  "}",
+  "",
+  "// 4. Implement page chain construction",
+  "//    Pages link in reverse: last page first, first page last.",
+  "//    Each page's `next` field references the previous page's storage location.",
+].join("\n");
+---
+
+<Base currentPath="/implementation" title="Implementation">
+  <PageHeader
+    eyebrow="Section 03"
+    title="Implementation"
+    description="Core protocol guides and code examples for builders integrating Urma claims into clients and mirrors. Backend-specific guides are in the Backends section."
+  />
+
+  <!-- 1. Install -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">1. Install</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        The Urma Go library provides core types, encoding/decoding, and schema generation.
+        Backend implementations are separate modules.
+      </p>
+      <CodeBlock filename="shell" language="bash" code={installCode} />
+    </div>
+  </section>
+
+  <!-- 2. Encoding a Claim -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">2. Encode a Claim</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        Construct a <code>UrmaClaim</code>, serialize it as JSON, and wrap it in the appropriate
+        envelope. The codec handles size validation against the 8192-byte on-chain limit.
+      </p>
+      <CodeBlock filename="encode.go" language="go" code={encodeCode} />
+    </div>
+  </section>
+
+  <!-- 3. Decoding & Verification -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">3. Decode & Verify</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        On discovery, decode the envelope, parse the JSON payload, and run the validation pipeline.
+        Verify <code>sourceClaimId</code> matches the expected value computed from the source claim.
+      </p>
+      <CodeBlock filename="decode.go" language="go" code={decodeCode} />
+
+      <Callout title="Validation Order">
+        Filters are ordered by cost: zero-cost checks first (status, JSON decode,
+        sourceClaimId match), then signature verification, then network fetches last.
+      </Callout>
+    </div>
+  </section>
+
+  <!-- 4. Adding a Backend -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">4. Extending: New Storage Backend</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        The protocol is storage-agnostic. To add a new backend, define the manifest types and
+        page chain construction for that backend's storage model. Core types use opaque JSON
+        for <code>locationData</code>, <code>data</code>, and <code>next</code>. The backend
+        decides what goes inside them.
+      </p>
+      <CodeBlock filename="backend.go" language="go" code={backendCode} />
+
+      <Callout title="Note">
+        Core types (<code>UrmaClaim</code>, <code>ManifestPage</code>) remain unchanged. New backends
+        only define their own <code>locationData</code> schema and manifest payload types.
+        See the <a href="/backends/sia" class="text-[var(--color-thread)] underline">Sia backend</a>{" "}
+        for a complete implementation reference.
+      </Callout>
+    </div>
+  </section>
+</Base>

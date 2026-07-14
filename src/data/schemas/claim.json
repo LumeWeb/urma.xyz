@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://go.lumeweb.com/urma/urma-claim",
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "Protocol version",
+      "examples": [
+        0
+      ]
+    },
+    "location": {
+      "type": "string",
+      "enum": [
+        "sia"
+      ],
+      "description": "Storage backend identifier"
+    },
+    "sourceClaimId": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "string",
+      "pattern": "[0-9a-f]{40}",
+      "maxItems": 20,
+      "minItems": 20,
+      "format": "hex",
+      "description": "Hex-encoded 20-byte ClaimID of the LBRY source claim"
+    },
+    "dataKey": {
+      "items": {
+        "type": "integer",
+        "format": "byte"
+      },
+      "type": "array",
+      "maxItems": 32,
+      "minItems": 32,
+      "description": "AES-256 encryption key for file content"
+    },
+    "locationData": {
+      "description": "Location-specific retrieval data. Structure depends on the location field"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "version",
+    "location",
+    "sourceClaimId",
+    "dataKey",
+    "locationData"
+  ]
+}

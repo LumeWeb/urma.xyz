@@ -1,0 +1,264 @@
+---
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+import Callout from "../../components/Callout.astro";
+import DataTable from "../../components/DataTable.astro";
+
+const manifestCode = [
+  'import (',
+  '    "go.lumeweb.com/urma"',
+  '    "go.lumeweb.com/urma/sia"',
+  '    "go.sia.tech/indexd/slabs"',
+  '    "go.sia.tech/siastorage"',
+  ')',
+  '',
+  "// 1. Create a page builder for this stream",
+  "builder := sia.NewPageBuilder(",
+  '    streamName, streamType, suggestedFileName,',
+  "    sourceClaimID, dataKey,  // urma.SourceClaimID, [32]byte",
+  ")",
+  "",
+  "// 2. Add blob entries: each carries LBRY blob hash/IV + Sia slab location",
+  "//    FromSlabSlice flattens a slabs.SlabSlice into ManifestBlob fields:",
+  "blob := sia.FromSlabSlice(slabSlice, blobHash, iv, blobLength, blobNum)",
+  "builder.Add(blob)",
+  "",
+  "// 3. Build the manifest chain (reverse order, handled internally)",
+  "//    The upload callback receives each page's JSON and returns the SlabSlice",
+  "//    that identifies where it was stored. BuildChain wires all Next pointers.",
+  "result, err := builder.BuildChain(maxBlobsPerPage, uploadFunc)",
+  "if err != nil {",
+  "    log.Fatal(err)",
+  "}",
+  "",
+  "// result.Claim      → urma.UrmaClaim (LocationData = root slab, JSON-encoded)",
+  "// result.RootSlab   → slabs.SlabSlice pointing to the first manifest page",
+  "// result.PageCount  → total pages in the chain",
+].join("\n");
+
+const decodeCode = [
+  'import (',
+  '    "encoding/json"',
+  '    "go.lumeweb.com/urma"',
+  '    "go.lumeweb.com/urma/sia"',
+  ')',
+  '',
+  "// 1. Decode the root slab from the claim's locationData",
+  "rootSlab, err := sia.DecodeRootSlab(claim)",
+  "if err != nil {",
+  "    log.Fatal(err)",
+  "}",
+  "",
+  "// 2. Fetch the ManifestPage JSON from Sia using the slab slice",
+  "//    (via siastorage.SDK or any Sia client that resolves a SlabSlice)",
+  "//    pageJSON := fetchFromSia(rootSlab)",
+  "//    var page urma.ManifestPage",
+  "//    json.Unmarshal(pageJSON, &page)",
+  "",
+  "// 3. Decode page 0 as a Manifest (stream metadata + blobs)",
+  "manifest, err := sia.DecodeManifestPage(page)",
+  "if err != nil {",
+  "    log.Fatal(err)",
+  "}",
+  "",
+  "// 4. Walk the chain: decode Next, fetch next page, decode as ManifestBlobs",
+  "nextSlab, err := sia.DecodeNextSlab(page)",
+  "for nextSlab != nil {",
+  "    // fetch nextPageJSON at nextSlab from Sia...",
+  "    var nextPage urma.ManifestPage",
+  '    json.Unmarshal(nextPageJSON, &nextPage)',
+  "    blobs, err := sia.DecodeManifestBlobsPage(nextPage)",
+  "    // accumulate blobs...",
+  "    nextSlab, err = sia.DecodeNextSlab(nextPage)",
+  "}",
+  "",
+  "// 5. Each ManifestBlob converts back to a slabs.SlabSlice for retrieval",
+  "slice := blob.ToSlabSlice()",
+].join("\n");
+
+const uploadCode = [
+  '// UploadFunc is called once per page, in reverse order (last page first).',
+  "// The builder handles Next pointer wiring: just upload and return the slab.",
+  "type UploadFunc func(pageJSON []byte) (slabs.SlabSlice, error)",
+  "",
+  "// Example using the siastorage SDK:",
+  "// Upload each serialized ManifestPage as a Sia object, then return",
+  "// the SlabSlice that identifies where it was stored.",
+  "func uploadFunc(pageJSON []byte) (slabs.SlabSlice, error) {",
+  "    obj := siastorage.NewEmptyObject()",
+  "    err := sdk.Upload(ctx, &obj, bytes.NewReader(pageJSON))",
+  "    if err != nil {",
+  "        return slabs.SlabSlice{}, err",
+  "    }",
+  "    err = sdk.PinObject(ctx, obj)",
+  "    if err != nil {",
+  "        return slabs.SlabSlice{}, err",
+  "    }",
+  "    // Return the first (and only) slab slice: the manifest page",
+  "    // was uploaded as a single object.",
+  "    slabs := obj.Slabs()",
+  "    return slabs[0], nil",
+  "}",
+].join("\n");
+
+const manifestPageFields = [
+  { field: "data", type: "json.RawMessage", description: "Sia-specific manifest payload (Manifest or ManifestBlobs)." },
+  { field: "next", type: "json.RawMessage", description: "Sia SlabSlice pointing to the next page. Omitted on last page." },
+];
+
+const manifestFields = [
+  { field: "streamName", type: "string", description: "Original stream name." },
+  { field: "streamType", type: "string", description: "LBRY stream type (typically \"lbryfile\")." },
+  { field: "suggestedFileName", type: "string", description: "Suggested file name for the stream." },
+  { field: "blobs", type: "[]ManifestBlob", description: "Blob entries for this page." },
+];
+
+const manifestBlobsFields = [
+  { field: "blobs", type: "[]ManifestBlob", description: "Blob entries for this continuation page." },
+];
+
+const manifestBlobFields = [
+  { field: "blobHash", type: "string", description: "SHA-384 hash of encrypted LBRY blob (hex-encoded)." },
+  { field: "iv", type: "string", description: "AES IV for blob content (hex-encoded)." },
+  { field: "blobLength", type: "int", description: "LBRY blob size in bytes (max 2 MiB)." },
+  { field: "blobNum", type: "int", description: "Position in stream (0-indexed)." },
+  { field: "slabKey", type: "slabs.EncryptionKey", description: "Sia slab encryption key." },
+  { field: "minShards", type: "uint", description: "Minimum sectors for recovery." },
+  { field: "sectors", type: "[]slabs.PinnedSector", description: "Pinned sectors for this blob's slab." },
+  { field: "slabOffset", type: "uint32", description: "Byte offset into slab data." },
+  { field: "slabLength", type: "uint32", description: "Number of data bytes in slab slice." },
+];
+---
+
+<Base currentPath="/backends/sia" title="Sia Backend">
+  <PageHeader
+    eyebrow="Backend"
+    title="Sia Storage Backend"
+    description="The Sia backend implements manifest page construction, slab-based upload, and claim encoding for the Sia distributed storage network."
+  />
+
+  <!-- Overview -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Overview</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        Sia is the first implemented storage backend for Urma. It uses Sia's slab-based
+        storage primitives to upload manifest pages and track their locations. The backend
+        provides a <code>PageBuilder</code> that handles the full manifest chain construction
+        including reverse-order page linking.
+      </p>
+      <Callout title="Note">
+        The Sia backend is a separate module: <code>go.lumeweb.com/urma/sia</code>. It is not
+        part of the core protocol: it implements the manifest types and upload logic specific
+        to Sia's storage model.
+      </Callout>
+    </div>
+  </section>
+
+  <!-- Location Data -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Location Data</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        The Sia location identifier is the string <code>"sia"</code>. The root location data
+        stored in an <code>UrmaClaim</code>'s <code>locationData</code> field is a
+        <code>slabs.SlabSlice</code> pointing to the first <code>ManifestPage</code> object on Sia.
+      </p>
+    </div>
+  </section>
+
+  <!-- Manifest Structure -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Manifest Types</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        Sia manifest pages follow the core <code>ManifestPage</code> structure. The <code>data</code>
+        payload on page 0 is a <code>Manifest</code> (stream metadata + blobs). Continuation pages
+        use <code>ManifestBlobs</code> (blobs only).
+      </p>
+
+      <DataTable
+        title="ManifestPage (Sia)"
+        subtitle="Core type: data and next are Sia-specific payloads."
+        fields={manifestPageFields}
+      />
+
+      <DataTable
+        title="Manifest"
+        subtitle="Page 0 payload: stream metadata + first page of blob entries."
+        fields={manifestFields}
+      />
+
+      <DataTable
+        title="ManifestBlobs"
+        subtitle="Continuation page payload (page 1+): blob entries only."
+        fields={manifestBlobsFields}
+      />
+
+      <DataTable
+        title="ManifestBlob"
+        subtitle="Per-blob entry carrying Sia retrieval and LBRY compatibility data."
+        fields={manifestBlobFields}
+      />
+    </div>
+  </section>
+
+  <!-- Building Manifest Chain -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Building a Manifest Chain</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        Pages are built in <strong>reverse order</strong>: last page first, first page last. This
+        allows each page's <code>next</code> pointer to reference the storage location of the
+        previously uploaded page.
+      </p>
+      <CodeBlock filename="manifest.go" language="go" code={manifestCode} />
+    </div>
+  </section>
+
+  <!-- Upload Callback -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Upload Callback</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        The <code>BuildChain</code> method accepts an <code>UploadFunc</code> callback. The builder
+        calls this function with each serialized manifest page, expecting a slab slice in return.
+        This decouples the builder from the specific Sia renter implementation.
+      </p>
+      <CodeBlock filename="upload.go" language="go" code={uploadCode} />
+    </div>
+  </section>
+
+  <!-- Decoding -->
+  <section class="mb-20 relative">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Decoding & Retrieval</h2>
+    </div>
+    <div class="prose">
+      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+        On the consumer side, decode the root slab from the claim, fetch manifest pages from Sia,
+        and walk the chain. Page 0 decodes as a <code>Manifest</code>; continuation pages decode as
+        <code>ManifestBlobs</code>. Each <code>ManifestBlob</code> converts back to a
+        <code>slabs.SlabSlice</code> for retrieval.
+      </p>
+      <CodeBlock filename="decode.go" language="go" code={decodeCode} />
+    </div>
+  </section>
+</Base>

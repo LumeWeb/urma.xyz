@@ -1,0 +1,44 @@
+---
+interface Field {
+  field: string;
+  type: string;
+  description: string;
+}
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  fields: Field[];
+}
+
+const { title, subtitle, fields } = Astro.props;
+---
+
+<div class="bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-sm overflow-hidden my-8">
+  {title && (
+    <div class="px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-paper)]/50">
+      <h3 class="font-[var(--font-serif)] text-xl font-medium text-[var(--color-ink)]">{title}</h3>
+      {subtitle && <p class="text-sm text-[var(--color-muted)] mt-1">{subtitle}</p>}
+    </div>
+  )}
+  <div class="overflow-x-auto">
+    <table class="data-table" style="border: none;">
+      <thead>
+        <tr>
+          <th class="w-1/4">Field</th>
+          <th class="w-1/4">Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {fields.map((f) => (
+          <tr>
+            <td class="field-name">{f.field}</td>
+            <td class="field-type">{f.type}</td>
+            <td class="text-[var(--color-ink)]">{f.description}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

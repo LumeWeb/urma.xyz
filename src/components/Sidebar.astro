@@ -1,0 +1,162 @@
+---
+import { NAV_ITEMS } from "../config/nav";
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+---
+
+<!-- Mobile top nav -->
+<nav class="sticky top-0 w-full z-50 border-b border-[var(--color-border)] bg-[var(--color-paper)]/90 backdrop-blur-md flex justify-between items-center px-6 h-16 md:hidden">
+  <div class="flex items-center gap-3">
+    <span class="font-[var(--font-serif)] text-xl font-medium text-[var(--color-ink)]">Urma</span>
+    <span class="label-caps text-[var(--color-origin)] bg-[var(--color-paper-alt)] px-2 py-1 border border-[var(--color-border)] rounded-sm flex items-center gap-1.5">
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-origin)]"></span>
+      v0
+    </span>
+  </div>
+  <button id="mobile-menu-toggle" class="p-2 text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors" aria-label="Toggle menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- Mobile drawer -->
+<div id="mobile-drawer" class="hidden fixed inset-0 z-40 md:hidden">
+  <div class="absolute inset-0 bg-[var(--color-ink)]/20" id="mobile-drawer-backdrop"></div>
+  <aside class="absolute left-0 top-0 h-full w-[280px] bg-[var(--color-paper-alt)] border-r border-[var(--color-border)] flex flex-col py-8 px-4 overflow-y-auto">
+    <div class="px-4 mb-8">
+      <h1 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)] mb-1">Urma Protocol</h1>
+      <span class="label-caps text-[var(--color-origin)] flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-origin)]"></span>
+        v0 Draft
+      </span>
+    </div>
+    <nav class="flex-1 flex flex-col gap-1">
+      {NAV_ITEMS.map((item) => {
+        const isActive = currentPath === item.href;
+        const childActive = item.children?.some(c => currentPath === c.href);
+        return (
+          <>
+            <a
+              href={item.href}
+              class={`flex items-center gap-3 py-2 pl-4 label-caps transition-colors ${
+                isActive || childActive
+                  ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] bg-[var(--color-paper)]"
+                  : "text-[var(--color-ink)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+              }`}
+            >
+              <span class="material-symbols-outlined text-[18px]">{item.icon}</span>
+              {item.label}
+            </a>
+            {item.children && (isActive || childActive) && (
+              <div class="flex flex-col gap-1 ml-4">
+                {item.children.map((child) => {
+                  const childActive = currentPath === child.href;
+                  return (
+                    <a
+                      href={child.href}
+                      class={`flex items-center gap-2 py-1.5 pl-4 text-sm transition-colors ${
+                        childActive
+                          ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] bg-[var(--color-paper)]"
+                          : "text-[var(--color-muted)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+                      }`}
+                    >
+                      <span class="material-symbols-outlined text-[16px]">{child.icon}</span>
+                      {child.label}
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        );
+      })}
+    </nav>
+  </aside>
+</div>
+
+<!-- Desktop sidebar -->
+<aside class="hidden md:flex flex-col py-12 fixed left-0 top-0 h-full w-[280px] border-r border-[var(--color-border)] bg-[var(--color-paper-alt)] z-40 overflow-y-auto">
+  <div class="px-6 mb-12">
+    <h1 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)] mb-2">Urma Protocol</h1>
+    <span class="label-caps text-[var(--color-origin)] bg-[var(--color-paper)] px-2 py-1 border border-[var(--color-border)] inline-flex items-center gap-2 rounded-sm">
+      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-origin)]"></span>
+      v0 Draft
+    </span>
+  </div>
+  <nav class="flex-1 px-4 flex flex-col gap-1">
+    {NAV_ITEMS.map((item) => {
+      const isActive = currentPath === item.href;
+      const childActive = item.children?.some(c => currentPath === c.href);
+      return (
+        <>
+          <a
+            href={item.href}
+            class={`flex items-center gap-3 py-2 pl-4 label-caps transition-colors ${
+              isActive || childActive
+                ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] font-bold"
+                : "text-[var(--color-ink)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+            }`}
+          >
+            <span class="material-symbols-outlined text-[18px]">{item.icon}</span>
+            {item.label}
+          </a>
+          {item.children && (isActive || childActive) && (
+            <div class="flex flex-col gap-1 ml-4">
+              {item.children.map((child) => {
+                const childActive = currentPath === child.href;
+                return (
+                  <a
+                    href={child.href}
+                    class={`flex items-center gap-2 py-1.5 pl-4 text-sm transition-colors ${
+                      childActive
+                        ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] bg-[var(--color-paper)]"
+                        : "text-[var(--color-muted)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+                    }`}
+                  >
+                    <span class="material-symbols-outlined text-[16px]">{child.icon}</span>
+                    {child.label}
+                    </a>
+                );
+              })}
+            </div>
+          )}
+        </>
+      );
+    })}
+  </nav>
+  <div class="px-6 mt-auto">
+    <a
+      href="https://github.com/LumeWeb/urma"
+      target="_blank"
+      rel="noopener"
+      class="block w-full py-3 bg-[var(--color-ink)] text-[var(--color-paper)] label-caps text-center hover:opacity-90 transition-opacity rounded-sm"
+    >
+      GitHub
+    </a>
+  </div>
+</aside>
+
+
+
+<script>
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const drawer = document.getElementById("mobile-drawer");
+  const backdrop = document.getElementById("mobile-drawer-backdrop");
+
+  function openDrawer() {
+    drawer?.classList.remove("hidden");
+  }
+  function closeDrawer() {
+    drawer?.classList.add("hidden");
+  }
+
+  toggle?.addEventListener("click", openDrawer);
+  backdrop?.addEventListener("click", closeDrawer);
+</script>

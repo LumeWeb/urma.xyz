@@ -1,0 +1,47 @@
+---
+interface Props {
+  filename?: string;
+  language?: string;
+  code: string;
+}
+
+const { filename, language, code } = Astro.props;
+---
+
+<div class="code-block my-8 group">
+  <div class="code-block-header">
+    {filename && (
+      <span class="label-caps text-[var(--color-muted)]">{filename}</span>
+    )}
+    {!filename && <span></span>}
+    <button
+      class="copy-btn text-[var(--color-muted)] hover:text-[var(--color-paper)] transition-colors opacity-0 group-hover:opacity-100"
+      title="Copy code"
+      aria-label="Copy code"
+    >
+      <span class="material-symbols-outlined text-[18px]">content_copy</span>
+    </button>
+  </div>
+  <pre><code class={language}>{code}</code></pre>
+</div>
+
+<script>
+  import { copyText } from "../scripts/clipboard";
+
+  document.querySelectorAll(".copy-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const code = btn.closest(".code-block")?.querySelector("pre code");
+      if (code) {
+        await copyText(code.textContent || "");
+        const icon = btn.querySelector(".material-symbols-outlined");
+        if (icon) {
+          if (!icon.dataset.origLabel) icon.dataset.origLabel = icon.textContent;
+          icon.textContent = "check";
+          clearTimeout(Number(icon.dataset.timerId));
+          const id = setTimeout(() => { icon.textContent = icon.dataset.origLabel; }, 1500);
+          icon.dataset.timerId = String(id);
+        }
+      }
+    });
+  });
+</script>

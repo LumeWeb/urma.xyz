@@ -1,0 +1,163 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import DataTable from "../components/DataTable.astro";
+
+// Load generated schemas
+import claimSchema from "../data/schemas/claim.json";
+import manifestSchema from "../data/schemas/manifest.json";
+import manifestBlobsSchema from "../data/schemas/manifest-blobs.json";
+import manifestBlobSchema from "../data/schemas/manifest-blob.json";
+import siaSchema from "../data/schemas/sia.json";
+
+const schemas = [
+  { name: "claim.json", description: "UrmaClaim JSON Schema", schema: claimSchema },
+  { name: "manifest.json", description: "ManifestPage (page 0) JSON Schema", schema: manifestSchema },
+  { name: "manifest-blobs.json", description: "ManifestBlobs (continuation) JSON Schema", schema: manifestBlobsSchema },
+  { name: "manifest-blob.json", description: "ManifestBlob entry JSON Schema", schema: manifestBlobSchema },
+  { name: "sia.json", description: "Sia backend (SlabSlice + sectors) JSON Schema", schema: siaSchema },
+];
+
+const rpcReference = [
+  { field: "getclaimsforname", type: "RPC", description: "Returns all claims at a name (primary discovery)." },
+  { field: "getclaimsfornamebyid", type: "RPC", description: "Returns a specific claim by ID." },
+  { field: "getclaimsfornamebybid", type: "RPC", description: "Returns a claim by bid position." },
+  { field: "getclaimsfornamebyseq", type: "RPC", description: "Returns a claim by index sequence." },
+  { field: "getchangesinblock", type: "RPC", description: "Returns all names changed in a block." },
+  { field: "normalize", type: "RPC", description: "Returns the normalized form of a claim name." },
+];
+
+const claimStatuses = [
+  { field: "Activated", type: "Status", description: "Live, bid counts toward ranking. Process." },
+  { field: "Accepted", type: "Status", description: "Waiting for activation delay. Skip." },
+  { field: "Deactivated", type: "Status", description: "UTXO spent (abandoned). Skip." },
+];
+---
+
+<Base currentPath="/reference" title="Reference">
+  <PageHeader
+    eyebrow="Section 04"
+    title="Reference"
+    description="Generated JSON schemas, protocol constants, and activation formulas. Machine-readable artifacts for validation and integration."
+  />
+
+  <!-- JSON Schemas -->
+  <section class="mb-20">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">JSON Schemas</h2>
+    </div>
+    <p class="text-[var(--color-ink)] max-w-[75ch] mb-8">
+      Generated from Go source via <code class="font-[var(--font-mono)] text-sm bg-[var(--color-paper-alt)] px-1.5 py-0.5 rounded border border-[var(--color-border)]">go run ./cmd/schemas</code>. These schemas define the canonical wire format for all Urma data structures.
+    </p>
+
+    <div class="space-y-8">
+      {schemas.map((s) => (
+        <div class="border border-[var(--color-border)] rounded-sm overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-paper-alt)]">
+            <div>
+              <h3 class="font-[var(--font-mono)] text-sm font-semibold text-[var(--color-ink)]">{s.name}</h3>
+              <p class="text-sm text-[var(--color-muted)] mt-0.5">{s.description}</p>
+            </div>
+            <button class="copy-schema-btn text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors" data-schema-name={s.name} aria-label="Copy schema">
+              <span class="material-symbols-outlined text-[18px]">content_copy</span>
+            </button>
+          </div>
+          <div class="bg-[var(--color-code-surface)] p-6 overflow-x-auto">
+            <pre class="font-[var(--font-mono)] text-sm text-[var(--color-code-text)] leading-[1.5]"><code>{JSON.stringify(s.schema, null, 2)}</code></pre>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Section divider -->
+  <div class="section-divider">
+    <div class="star"></div>
+  </div>
+
+  <!-- RPC Reference -->
+  <section class="mb-20">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">RPC Reference</h2>
+    </div>
+    <p class="text-[var(--color-ink)] max-w-[75ch] mb-8">
+      LBRY daemon RPCs used for claim discovery and resolution. All queries are local against the
+      node's own claimtrie database.
+    </p>
+    <DataTable fields={rpcReference} />
+  </section>
+
+  <!-- Claim Status -->
+  <section class="mb-20">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Claim Status Lifecycle</h2>
+    </div>
+    <p class="text-[var(--color-ink)] max-w-[75ch] mb-8">
+      Claims transition through three states. Only <code>Activated</code> claims are processed by the
+      validation pipeline.
+    </p>
+    <DataTable fields={claimStatuses} />
+
+    <div class="mt-8 bg-[var(--color-paper-alt)] border border-[var(--color-border)] p-6">
+      <h4 class="label-caps text-[var(--color-muted)] mb-3">Activation Delay</h4>
+      <p class="text-sm text-[var(--color-ink)] mb-4">
+        For new claims at a name with an existing controlling claim:
+      </p>
+      <CodeBlock filename="formula" language="text" code={`delay = min(4032, (currentHeight - lastTakeoverHeight) / 32)
+
+// Maximum delay: 4032 blocks (~7 days)
+// First claim at a fresh name: delay = 0 (immediate activation)`} />
+    </div>
+  </section>
+
+  <!-- Security Properties -->
+  <section class="mb-20">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="star-marker"></span>
+      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Security Properties</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {[
+        { threat: "Name squatting (global)", mitigation: "Multiple claims coexist; squatting doesn't remove others" },
+        { threat: "Name squatting (creator)", mitigation: "Cryptographically impossible without channel key" },
+        { threat: "Spoofed Urma data", mitigation: "Download-time SHA-384 verification per blob" },
+        { threat: "Stale/expired Urmas", mitigation: "Storage fetch fails at filter step 5; client skips" },
+        { threat: "Spam flood", mitigation: "Economic: each claim locks LBC in a UTXO" },
+        { threat: "Censorship", mitigation: "Claimtrie replicated on every full node; local resolution" },
+        { threat: "Takeover attack", mitigation: "Activation delay (up to ~7 days) slows displacement" },
+        { threat: "Forged creator signature", mitigation: "ECDSA verification against channel public key" },
+      ].map((item) => (
+        <div class="border border-[var(--color-border)] p-4 bg-[var(--color-paper-alt)]">
+          <p class="font-[var(--font-mono)] text-sm font-semibold text-[var(--color-ink)] mb-1">{item.threat}</p>
+          <p class="text-sm text-[var(--color-muted)]">{item.mitigation}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { copyText } from "../scripts/clipboard";
+
+  document.querySelectorAll(".copy-schema-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const card = btn.closest(".border");
+      const pre = card?.querySelector("pre code");
+      if (pre) {
+        await copyText(pre.textContent || "");
+        const icon = btn.querySelector(".material-symbols-outlined");
+        if (icon) {
+          if (!icon.dataset.origLabel) icon.dataset.origLabel = icon.textContent;
+          icon.textContent = "check";
+          clearTimeout(Number(icon.dataset.timerId));
+          const id = setTimeout(() => { icon.textContent = icon.dataset.origLabel; }, 1500);
+          icon.dataset.timerId = String(id);
+        }
+      }
+    });
+  });
+</script>

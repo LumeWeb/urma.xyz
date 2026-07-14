@@ -1,0 +1,37 @@
+---
+import Sidebar from "../components/Sidebar.astro";
+import "../styles/global.css";
+
+interface Props {
+  currentPath: string;
+  title: string;
+}
+
+const { currentPath, title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}: Urma Protocol</title>
+    <meta name="description" content="A protocol for mirroring content across independent storage networks." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="antialiased overflow-x-hidden min-h-screen">
+    <Sidebar currentPath={currentPath} />
+    <main class="md:ml-[280px] p-6 md:p-16 max-w-[1080px] mx-auto">
+      <slot />
+      <footer class="mt-20 pt-8 border-t border-[var(--color-border)]">
+        <p class="text-sm text-[var(--color-muted)]">
+          A <a href="https://lumeweb.com" class="text-[var(--color-thread)] underline" target="_blank" rel="noopener">Lume</a> project.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
