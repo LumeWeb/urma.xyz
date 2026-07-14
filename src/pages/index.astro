@@ -6,12 +6,12 @@ import Callout from "../components/Callout.astro";
 
 <Base currentPath="/" title="Urma Protocol">
   <!-- Hero -->
-  <header class="relative py-20 border-b border-[var(--color-border)] mb-20 overflow-hidden">
+  <header class="relative py-20 border-b border-border mb-20 overflow-hidden">
     <div class="relative z-10 max-w-3xl">
-      <h2 class="font-[var(--font-serif)] text-4xl md:text-6xl font-medium tracking-[-0.02em] leading-[1.1] text-[var(--color-ink)] mb-8">
+      <h2 class="font-serif text-4xl md:text-6xl font-medium tracking-[-0.02em] leading-[1.1] text-ink mb-8">
         A protocol for mirroring content across independent networks.
       </h2>
-      <p class="text-lg leading-[1.65] text-[var(--color-on-surface-variant)] max-w-2xl border-l border-[var(--color-border)] pl-4">
+      <p class="text-lg leading-[1.65] text-on-surface-variant max-w-2xl border-l border-border pl-4">
         A claims-based protocol for tracing files through a web of mirrors. Connection, not storage.
       </p>
     </div>
@@ -20,20 +20,20 @@ import Callout from "../components/Callout.astro";
   <!-- Connection Model -->
   <section class="mb-20 prose">
     <div class="flex items-center gap-4 mb-8">
-      <span class="w-8 h-px bg-[var(--color-border)]"></span>
-      <h3 class="font-[var(--font-serif)] text-2xl md:text-3xl font-medium text-[var(--color-ink)]">
+      <span class="w-8 h-px bg-border"></span>
+      <h3 class="font-serif text-2xl md:text-3xl font-medium text-ink">
         The Connection Model
       </h3>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
       <div class="md:col-span-8 space-y-6">
-        <p class="text-lg leading-[1.65] text-[var(--color-ink)]">
+        <p class="text-lg leading-[1.65] text-ink">
           The philosophy of Urma is built entirely on the concept of the <strong>Connection Model</strong>.
           Rather than concerning itself with where data is stored or how it is transmitted, Urma focuses
           purely on providing a censorship-resistant link from a claim to a storage mirror.
         </p>
-        <p class="text-[var(--color-ink)]">
+        <p class="text-ink">
           A claim name resolves to one or more mirror locations: alternative storage sources for the
           same content. Each mirror is an independent copy on a different storage network. Urma does not
           verify that mirrors are byte-identical across networks. It provides the discovery mechanism:
@@ -46,22 +46,22 @@ import Callout from "../components/Callout.astro";
         </Callout>
       </div>
 
-      <div class="md:col-span-4 pl-4 border-l border-[var(--color-border)] hidden md:block">
-        <ul class="font-[var(--font-mono)] text-sm text-[var(--color-muted)] space-y-4">
+      <div class="md:col-span-4 pl-4 border-l border-border hidden md:block">
+        <ul class="font-mono text-sm text-muted space-y-4">
           <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-border)]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-border"></span>
             Storage Agnostic
           </li>
           <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-border)]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-border"></span>
             Verifiable Claims
           </li>
           <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-border)]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-border"></span>
             Decentralized Topology
           </li>
           <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-border)]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-border"></span>
             Proof-Based Integrity
           </li>
         </ul>
@@ -75,11 +75,11 @@ import Callout from "../components/Callout.astro";
   </div>
 
   <!-- How It Works -->
-  <section class="mb-20 bg-[var(--color-paper-alt)] p-8 md:p-12 border border-[var(--color-border)]">
-    <h3 class="font-[var(--font-serif)] text-2xl md:text-3xl font-medium text-[var(--color-ink)] mb-6">
+  <section class="mb-20 bg-paper-alt p-8 md:p-12 border border-border">
+    <h3 class="font-serif text-2xl md:text-3xl font-medium text-ink mb-6">
       How It Works
     </h3>
-    <p class="text-[var(--color-ink)] mb-8 max-w-2xl">
+    <p class="text-ink mb-8 max-w-2xl">
       The protocol operates through a chain of signed claims and manifests. A publisher declares that
       a mirror exists for a piece of content, stakes a claim on the network, and broadcasts it. No
       one verifies the claim at broadcast time, like a torrent, the claim is an assertion. Staking
@@ -89,38 +89,38 @@ import Callout from "../components/Callout.astro";
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-[var(--color-paper)] border border-[var(--color-border)] p-6">
+      <div class="bg-paper border border-border p-6">
         <div class="flex items-center gap-2 mb-3">
           <span class="star-marker"></span>
-          <span class="label-caps text-[var(--color-origin)]">Step 01</span>
+          <span class="label-caps text-origin">Step 01</span>
         </div>
-        <h4 class="font-[var(--font-serif)] text-lg font-medium text-[var(--color-ink)] mb-2">Publish</h4>
-          <p class="text-sm text-[var(--color-muted)]">
+        <h4 class="font-serif text-lg font-medium text-ink mb-2">Publish</h4>
+          <p class="text-sm text-muted">
             A publisher mirrors content on a storage network, constructs the manifest pages and root
             pointer (backend-specific), and wraps them in an UrmaClaim. Staking the claim on-chain
             costs something: an anti-spam mechanism and trust signal.
           </p>
       </div>
 
-      <div class="bg-[var(--color-paper)] border border-[var(--color-border)] p-6">
+      <div class="bg-paper border border-border p-6">
         <div class="flex items-center gap-2 mb-3">
-          <span class="w-2 h-2 rounded-full bg-[var(--color-thread)]"></span>
-          <span class="label-caps text-[var(--color-thread)]">Step 02</span>
+          <span class="w-2 h-2 rounded-full bg-thread"></span>
+          <span class="label-caps text-thread">Step 02</span>
         </div>
-        <h4 class="font-[var(--font-serif)] text-lg font-medium text-[var(--color-ink)] mb-2">Discover</h4>
-        <p class="text-sm text-[var(--color-muted)]">
+        <h4 class="font-serif text-lg font-medium text-ink mb-2">Discover</h4>
+        <p class="text-sm text-muted">
           Clients compute the deterministic Urma name from a source claim ID and query the claimtrie
           for all mirrors at that name.
         </p>
       </div>
 
-      <div class="bg-[var(--color-paper)] border border-[var(--color-border)] p-6">
+      <div class="bg-paper border border-border p-6">
         <div class="flex items-center gap-2 mb-3">
-          <span class="w-2 h-2 rounded-full bg-[var(--color-muted)]"></span>
-          <span class="label-caps text-[var(--color-muted)]">Step 03</span>
+          <span class="w-2 h-2 rounded-full bg-muted"></span>
+          <span class="label-caps text-muted">Step 03</span>
         </div>
-        <h4 class="font-[var(--font-serif)] text-lg font-medium text-[var(--color-ink)] mb-2">Verify</h4>
-        <p class="text-sm text-[var(--color-muted)]">
+        <h4 class="font-serif text-lg font-medium text-ink mb-2">Verify</h4>
+        <p class="text-sm text-muted">
           Each blob is verified via SHA-384 hash comparison. Signatures are checked against the
           channel public key. Poisoned mirrors fail on first download.
         </p>
@@ -131,22 +131,22 @@ import Callout from "../components/Callout.astro";
   <!-- Naming -->
   <section class="mb-20 prose">
     <div class="flex items-center gap-4 mb-8">
-      <span class="w-8 h-px bg-[var(--color-border)]"></span>
-      <h3 class="font-[var(--font-serif)] text-2xl md:text-3xl font-medium text-[var(--color-ink)]">
+      <span class="w-8 h-px bg-border"></span>
+      <h3 class="font-serif text-2xl md:text-3xl font-medium text-ink">
         Claim Naming
       </h3>
     </div>
 
-    <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+    <p class="text-ink max-w-[75ch] mb-6">
       Every Urma claim is identified by a deterministic name derived from the source content's ClaimID.
       The format is simple but precise:
     </p>
 
-    <div class="bg-[var(--color-ink)] text-[var(--color-code-text)] rounded p-4 inline-block mb-6">
-      <code class="font-[var(--font-mono)] text-sm">u-&#123;source_claim_id_hex&#125;</code>
+    <div class="bg-ink text-code-text rounded p-4 inline-block mb-6">
+      <code class="font-mono text-sm">u-&#123;source_claim_id_hex&#125;</code>
     </div>
 
-    <p class="text-[var(--color-ink)] max-w-[75ch]">
+    <p class="text-ink max-w-[75ch]">
       The <code>u-</code> prefix designates the resource as a native Urma entity. The payload is a
       40-character lowercase hex encoding of the 20-byte source ClaimID. Clients compute this name
       from content they already discovered, then query for all Urma claims at that name.

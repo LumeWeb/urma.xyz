@@ -11,12 +11,12 @@ const variant = icon === "warning" ? "callout-warning" : "callout-note";
 <div class={`callout ${variant} my-8`}>
   <div class="callout-bar"></div>
   {title && (
-    <h4 class="label-caps text-[var(--color-thread)] mb-2 flex items-center gap-2">
+    <h4 class="label-caps text-thread mb-2 flex items-center gap-2">
       <span class="material-symbols-outlined text-[16px]">{icon}</span>
       {title}
     </h4>
   )}
-  <div class="text-sm text-[var(--color-ink)] m-0 prose">
+  <div class="text-sm text-ink m-0 prose">
     <slot />
   </div>
 </div>

@@ -9,15 +9,15 @@ const { currentPath } = Astro.props;
 ---
 
 <!-- Mobile top nav -->
-<nav class="sticky top-0 w-full z-50 border-b border-[var(--color-border)] bg-[var(--color-paper)]/90 backdrop-blur-md flex justify-between items-center px-6 h-16 md:hidden">
+<nav class="sticky top-0 w-full z-50 border-b border-border bg-paper/90 backdrop-blur-md flex justify-between items-center px-6 h-16 md:hidden">
   <div class="flex items-center gap-3">
-    <span class="font-[var(--font-serif)] text-xl font-medium text-[var(--color-ink)]">Urma</span>
-    <span class="label-caps text-[var(--color-origin)] bg-[var(--color-paper-alt)] px-2 py-1 border border-[var(--color-border)] rounded-sm flex items-center gap-1.5">
-      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-origin)]"></span>
+    <span class="font-serif text-xl font-medium text-ink">Urma</span>
+    <span class="label-caps text-origin bg-paper-alt px-2 py-1 border border-border rounded-sm flex items-center gap-1.5">
+      <span class="w-1.5 h-1.5 rounded-full bg-origin"></span>
       v0
     </span>
   </div>
-  <button id="mobile-menu-toggle" class="p-2 text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors" aria-label="Toggle menu">
+  <button id="mobile-menu-toggle" class="p-2 text-muted hover:text-ink transition-colors" aria-label="Toggle menu">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
       <line x1="3" y1="6" x2="21" y2="6"/>
       <line x1="3" y1="12" x2="21" y2="12"/>
@@ -28,12 +28,12 @@ const { currentPath } = Astro.props;
 
 <!-- Mobile drawer -->
 <div id="mobile-drawer" class="hidden fixed inset-0 z-40 md:hidden">
-  <div class="absolute inset-0 bg-[var(--color-ink)]/20" id="mobile-drawer-backdrop"></div>
-  <aside class="absolute left-0 top-0 h-full w-[280px] bg-[var(--color-paper-alt)] border-r border-[var(--color-border)] flex flex-col py-8 px-4 overflow-y-auto">
+  <div class="absolute inset-0 bg-ink/20" id="mobile-drawer-backdrop"></div>
+  <aside class="absolute left-0 top-0 h-full w-[280px] bg-paper-alt border-r border-border flex flex-col py-8 px-4 overflow-y-auto">
     <div class="px-4 mb-8">
-      <h1 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)] mb-1">Urma Protocol</h1>
-      <span class="label-caps text-[var(--color-origin)] flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-origin)]"></span>
+      <h1 class="font-serif text-2xl font-medium text-ink mb-1">Urma Protocol</h1>
+      <span class="label-caps text-origin flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-origin"></span>
         v0 Draft
       </span>
     </div>
@@ -47,8 +47,8 @@ const { currentPath } = Astro.props;
               href={item.href}
               class={`flex items-center gap-3 py-2 pl-4 label-caps transition-colors ${
                 isActive || childActive
-                  ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] bg-[var(--color-paper)]"
-                  : "text-[var(--color-ink)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+                  ? "text-thread border-l-2 border-thread bg-paper"
+                  : "text-ink border-l-2 border-transparent hover:text-thread"
               }`}
             >
               <span class="material-symbols-outlined text-[18px]">{item.icon}</span>
@@ -63,8 +63,8 @@ const { currentPath } = Astro.props;
                       href={child.href}
                       class={`flex items-center gap-2 py-1.5 pl-4 text-sm transition-colors ${
                         childActive
-                          ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] bg-[var(--color-paper)]"
-                          : "text-[var(--color-muted)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+                          ? "text-thread border-l-2 border-thread bg-paper"
+                          : "text-muted border-l-2 border-transparent hover:text-thread"
                       }`}
                     >
                       <span class="material-symbols-outlined text-[16px]">{child.icon}</span>
@@ -82,11 +82,11 @@ const { currentPath } = Astro.props;
 </div>
 
 <!-- Desktop sidebar -->
-<aside class="hidden md:flex flex-col py-12 fixed left-0 top-0 h-full w-[280px] border-r border-[var(--color-border)] bg-[var(--color-paper-alt)] z-40 overflow-y-auto">
+<aside class="hidden md:flex flex-col py-12 fixed left-0 top-0 h-full w-[280px] border-r border-border bg-paper-alt z-40 overflow-y-auto">
   <div class="px-6 mb-12">
-    <h1 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)] mb-2">Urma Protocol</h1>
-    <span class="label-caps text-[var(--color-origin)] bg-[var(--color-paper)] px-2 py-1 border border-[var(--color-border)] inline-flex items-center gap-2 rounded-sm">
-      <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-origin)]"></span>
+    <h1 class="font-serif text-2xl font-medium text-ink mb-2">Urma Protocol</h1>
+    <span class="label-caps text-origin bg-paper px-2 py-1 border border-border inline-flex items-center gap-2 rounded-sm">
+      <span class="w-1.5 h-1.5 rounded-full bg-origin"></span>
       v0 Draft
     </span>
   </div>
@@ -100,8 +100,8 @@ const { currentPath } = Astro.props;
             href={item.href}
             class={`flex items-center gap-3 py-2 pl-4 label-caps transition-colors ${
               isActive || childActive
-                ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] font-bold"
-                : "text-[var(--color-ink)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+                ? "text-thread border-l-2 border-thread font-bold"
+                : "text-ink border-l-2 border-transparent hover:text-thread"
             }`}
           >
             <span class="material-symbols-outlined text-[18px]">{item.icon}</span>
@@ -116,8 +116,8 @@ const { currentPath } = Astro.props;
                     href={child.href}
                     class={`flex items-center gap-2 py-1.5 pl-4 text-sm transition-colors ${
                       childActive
-                        ? "text-[var(--color-thread)] border-l-2 border-[var(--color-thread)] bg-[var(--color-paper)]"
-                        : "text-[var(--color-muted)] border-l-2 border-transparent hover:text-[var(--color-thread)]"
+                        ? "text-thread border-l-2 border-thread bg-paper"
+                        : "text-muted border-l-2 border-transparent hover:text-thread"
                     }`}
                   >
                     <span class="material-symbols-outlined text-[16px]">{child.icon}</span>
@@ -136,7 +136,7 @@ const { currentPath } = Astro.props;
       href="https://github.com/LumeWeb/urma"
       target="_blank"
       rel="noopener"
-      class="block w-full py-3 bg-[var(--color-ink)] text-[var(--color-paper)] label-caps text-center hover:opacity-90 transition-opacity rounded-sm"
+      class="block w-full py-3 bg-ink text-paper label-caps text-center hover:opacity-90 transition-opacity rounded-sm"
     >
       GitHub
     </a>

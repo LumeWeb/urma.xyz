@@ -46,26 +46,26 @@ const claimStatuses = [
   <section class="mb-20">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">JSON Schemas</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">JSON Schemas</h2>
     </div>
-    <p class="text-[var(--color-ink)] max-w-[75ch] mb-8">
-      Generated from Go source via <code class="font-[var(--font-mono)] text-sm bg-[var(--color-paper-alt)] px-1.5 py-0.5 rounded border border-[var(--color-border)]">go run ./cmd/schemas</code>. These schemas define the canonical wire format for all Urma data structures.
+    <p class="text-ink max-w-[75ch] mb-8">
+      Generated from Go source via <code class="font-mono text-sm bg-paper-alt px-1.5 py-0.5 rounded border border-border">go run ./cmd/schemas</code>. These schemas define the canonical wire format for all Urma data structures.
     </p>
 
     <div class="space-y-8">
       {schemas.map((s) => (
-        <div class="border border-[var(--color-border)] rounded-sm overflow-hidden">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-paper-alt)]">
+        <div class="border border-border rounded-sm overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-border bg-paper-alt">
             <div>
-              <h3 class="font-[var(--font-mono)] text-sm font-semibold text-[var(--color-ink)]">{s.name}</h3>
-              <p class="text-sm text-[var(--color-muted)] mt-0.5">{s.description}</p>
+              <h3 class="font-mono text-sm font-semibold text-ink">{s.name}</h3>
+              <p class="text-sm text-muted mt-0.5">{s.description}</p>
             </div>
-            <button class="copy-schema-btn text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors" data-schema-name={s.name} aria-label="Copy schema">
+            <button class="copy-schema-btn text-muted hover:text-ink transition-colors" data-schema-name={s.name} aria-label="Copy schema">
               <span class="material-symbols-outlined text-[18px]">content_copy</span>
             </button>
           </div>
-          <div class="bg-[var(--color-code-surface)] p-6 overflow-x-auto">
-            <pre class="font-[var(--font-mono)] text-sm text-[var(--color-code-text)] leading-[1.5]"><code>{JSON.stringify(s.schema, null, 2)}</code></pre>
+          <div class="bg-code-surface p-6 overflow-x-auto">
+            <pre class="font-mono text-sm text-code-text leading-[1.5]"><code>{JSON.stringify(s.schema, null, 2)}</code></pre>
           </div>
         </div>
       ))}
@@ -81,9 +81,9 @@ const claimStatuses = [
   <section class="mb-20">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">RPC Reference</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">RPC Reference</h2>
     </div>
-    <p class="text-[var(--color-ink)] max-w-[75ch] mb-8">
+    <p class="text-ink max-w-[75ch] mb-8">
       LBRY daemon RPCs used for claim discovery and resolution. All queries are local against the
       node's own claimtrie database.
     </p>
@@ -94,17 +94,17 @@ const claimStatuses = [
   <section class="mb-20">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Claim Status Lifecycle</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">Claim Status Lifecycle</h2>
     </div>
-    <p class="text-[var(--color-ink)] max-w-[75ch] mb-8">
+    <p class="text-ink max-w-[75ch] mb-8">
       Claims transition through three states. Only <code>Activated</code> claims are processed by the
       validation pipeline.
     </p>
     <DataTable fields={claimStatuses} />
 
-    <div class="mt-8 bg-[var(--color-paper-alt)] border border-[var(--color-border)] p-6">
-      <h4 class="label-caps text-[var(--color-muted)] mb-3">Activation Delay</h4>
-      <p class="text-sm text-[var(--color-ink)] mb-4">
+    <div class="mt-8 bg-paper-alt border border-border p-6">
+      <h4 class="label-caps text-muted mb-3">Activation Delay</h4>
+      <p class="text-sm text-ink mb-4">
         For new claims at a name with an existing controlling claim:
       </p>
       <CodeBlock filename="formula" language="text" code={`delay = min(4032, (currentHeight - lastTakeoverHeight) / 32)
@@ -118,7 +118,7 @@ const claimStatuses = [
   <section class="mb-20">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">Security Properties</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">Security Properties</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       {[
@@ -131,9 +131,9 @@ const claimStatuses = [
         { threat: "Takeover attack", mitigation: "Activation delay (up to ~7 days) slows displacement" },
         { threat: "Forged creator signature", mitigation: "ECDSA verification against channel public key" },
       ].map((item) => (
-        <div class="border border-[var(--color-border)] p-4 bg-[var(--color-paper-alt)]">
-          <p class="font-[var(--font-mono)] text-sm font-semibold text-[var(--color-ink)] mb-1">{item.threat}</p>
-          <p class="text-sm text-[var(--color-muted)]">{item.mitigation}</p>
+        <div class="border border-border p-4 bg-paper-alt">
+          <p class="font-mono text-sm font-semibold text-ink mb-1">{item.threat}</p>
+          <p class="text-sm text-muted">{item.mitigation}</p>
         </div>
       ))}
     </div>

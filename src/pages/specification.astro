@@ -37,21 +37,21 @@ const constants = [
 
   <!-- 1. Claim Naming -->
   <section class="mb-20 relative">
-    <div class="absolute -left-6 top-2 bottom-0 w-px bg-[var(--color-border)] hidden lg:block"></div>
+    <div class="absolute -left-6 top-2 bottom-0 w-px bg-border hidden lg:block"></div>
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">1. Claim Naming</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">1. Claim Naming</h2>
     </div>
     <div class="pl-0 lg:pl-6 prose">
-      <p class="text-[var(--color-ink)] max-w-[75ch] mb-4">
+      <p class="text-ink max-w-[75ch] mb-4">
         Every atomic piece of verifiable data within the protocol is identified by a deterministic claim
         string. The naming convention relies on a consistent prefix followed by a cryptographically
         secure hash.
       </p>
-      <div class="bg-[var(--color-ink)] text-[var(--color-code-text)] rounded p-4 inline-block mb-4">
-        <code class="font-[var(--font-mono)] text-sm">u-&#123;source_claim_id_hex&#125;</code>
+      <div class="bg-ink text-code-text rounded p-4 inline-block mb-4">
+        <code class="font-mono text-sm">u-&#123;source_claim_id_hex&#125;</code>
       </div>
-      <p class="text-[var(--color-ink)] max-w-[75ch]">
+      <p class="text-ink max-w-[75ch]">
         The <code>u-</code> prefix designates the resource as a native Urma entity, distinct from raw
         IPFS CID hashes or standard domain name pointers. The payload must exactly equal 40 hexadecimal
         characters.
@@ -61,10 +61,10 @@ const constants = [
 
   <!-- 2. Data Structures -->
   <section class="mb-20 relative">
-    <div class="absolute -left-6 top-2 bottom-0 w-px bg-[var(--color-border)] hidden lg:block"></div>
+    <div class="absolute -left-6 top-2 bottom-0 w-px bg-border hidden lg:block"></div>
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">2. Data Structures</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">2. Data Structures</h2>
     </div>
 
     <div class="pl-0 lg:pl-6 space-y-12">
@@ -82,7 +82,7 @@ const constants = [
 
       <Callout title="Note">
         Backend-specific manifest types (blob entries, slab slices, etc.) are defined by each
-        backend, not by core. See the <a href="/backends/sia" class="text-[var(--color-thread)] underline">Sia backend</a>{" "}
+        backend, not by core. See the <a href="/backends/sia" class="text-thread underline">Sia backend</a>{" "}
         for a concrete example.
       </Callout>
     </div>
@@ -90,13 +90,13 @@ const constants = [
 
   <!-- 3. Envelope -->
   <section class="mb-20 relative">
-    <div class="absolute -left-6 top-2 bottom-0 w-px bg-[var(--color-border)] hidden lg:block"></div>
+    <div class="absolute -left-6 top-2 bottom-0 w-px bg-border hidden lg:block"></div>
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">3. Envelope & Signing</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">3. Envelope & Signing</h2>
     </div>
     <div class="pl-0 lg:pl-6 prose">
-      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+      <p class="text-ink max-w-[75ch] mb-6">
         Claim values are wrapped in an envelope with a version byte. Unsigned envelopes
         (<code>0x00</code>) contain just the JSON payload. Signed envelopes (<code>0x01</code>)
         include a channel ClaimID and ECDSA signature.
@@ -104,15 +104,15 @@ const constants = [
 
       <div class="space-y-4 mb-6">
         <div>
-          <p class="label-caps text-[var(--color-muted)] mb-2">Unsigned</p>
-          <div class="bg-[var(--color-ink)] text-[var(--color-code-text)] rounded p-4">
-            <code class="font-[var(--font-mono)] text-sm">[0x00] [UrmaClaim JSON bytes]</code>
+          <p class="label-caps text-muted mb-2">Unsigned</p>
+          <div class="bg-ink text-code-text rounded p-4">
+            <code class="font-mono text-sm">[0x00] [UrmaClaim JSON bytes]</code>
           </div>
         </div>
         <div>
-          <p class="label-caps text-[var(--color-muted)] mb-2">Signed</p>
-          <div class="bg-[var(--color-ink)] text-[var(--color-code-text)] rounded p-4">
-            <code class="font-[var(--font-mono)] text-sm">[0x01] [20-byte channel ClaimID] [64-byte ECDSA signature] [UrmaClaim JSON]</code>
+          <p class="label-caps text-muted mb-2">Signed</p>
+          <div class="bg-ink text-code-text rounded p-4">
+            <code class="font-mono text-sm">[0x01] [20-byte channel ClaimID] [64-byte ECDSA signature] [UrmaClaim JSON]</code>
           </div>
         </div>
       </div>
@@ -127,10 +127,10 @@ const constants = [
 
   <!-- 4. Constants -->
   <section class="mb-20 relative">
-    <div class="absolute -left-6 top-2 bottom-0 w-px bg-[var(--color-border)] hidden lg:block"></div>
+    <div class="absolute -left-6 top-2 bottom-0 w-px bg-border hidden lg:block"></div>
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">4. Constants</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">4. Constants</h2>
     </div>
     <div class="pl-0 lg:pl-6">
       <DataTable fields={constants} />

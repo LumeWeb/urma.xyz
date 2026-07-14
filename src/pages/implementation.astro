@@ -91,10 +91,10 @@ const backendCode = [
   <section class="mb-20 relative">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">1. Install</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">1. Install</h2>
     </div>
     <div class="prose">
-      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+      <p class="text-ink max-w-[75ch] mb-6">
         The Urma Go library provides core types, encoding/decoding, and schema generation.
         Backend implementations are separate modules.
       </p>
@@ -106,10 +106,10 @@ const backendCode = [
   <section class="mb-20 relative">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">2. Encode a Claim</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">2. Encode a Claim</h2>
     </div>
     <div class="prose">
-      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+      <p class="text-ink max-w-[75ch] mb-6">
         Construct a <code>UrmaClaim</code>, serialize it as JSON, and wrap it in the appropriate
         envelope. The codec handles size validation against the 8192-byte on-chain limit.
       </p>
@@ -121,10 +121,10 @@ const backendCode = [
   <section class="mb-20 relative">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">3. Decode & Verify</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">3. Decode & Verify</h2>
     </div>
     <div class="prose">
-      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+      <p class="text-ink max-w-[75ch] mb-6">
         On discovery, decode the envelope, parse the JSON payload, and run the validation pipeline.
         Verify <code>sourceClaimId</code> matches the expected value computed from the source claim.
       </p>
@@ -141,10 +141,10 @@ const backendCode = [
   <section class="mb-20 relative">
     <div class="flex items-center gap-3 mb-6">
       <span class="star-marker"></span>
-      <h2 class="font-[var(--font-serif)] text-2xl font-medium text-[var(--color-ink)]">4. Extending: New Storage Backend</h2>
+      <h2 class="font-serif text-2xl font-medium text-ink">4. Extending: New Storage Backend</h2>
     </div>
     <div class="prose">
-      <p class="text-[var(--color-ink)] max-w-[75ch] mb-6">
+      <p class="text-ink max-w-[75ch] mb-6">
         The protocol is storage-agnostic. To add a new backend, define the manifest types and
         page chain construction for that backend's storage model. Core types use opaque JSON
         for <code>locationData</code>, <code>data</code>, and <code>next</code>. The backend
@@ -155,7 +155,7 @@ const backendCode = [
       <Callout title="Note">
         Core types (<code>UrmaClaim</code>, <code>ManifestPage</code>) remain unchanged. New backends
         only define their own <code>locationData</code> schema and manifest payload types.
-        See the <a href="/backends/sia" class="text-[var(--color-thread)] underline">Sia backend</a>{" "}
+        See the <a href="/backends/sia" class="text-thread underline">Sia backend</a>{" "}
         for a complete implementation reference.
       </Callout>
     </div>

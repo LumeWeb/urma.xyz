@@ -27,9 +27,9 @@ const { currentPath, title } = Astro.props;
     <Sidebar currentPath={currentPath} />
     <main class="md:ml-[280px] p-6 md:p-16 max-w-[1080px] mx-auto">
       <slot />
-      <footer class="mt-20 pt-8 border-t border-[var(--color-border)]">
-        <p class="text-sm text-[var(--color-muted)]">
-          A <a href="https://lumeweb.com" class="text-[var(--color-thread)] underline" target="_blank" rel="noopener">Lume</a> project.
+      <footer class="mt-20 pt-8 border-t border-border">
+        <p class="text-sm text-muted">
+          A <a href="https://lumeweb.com" class="text-thread underline" target="_blank" rel="noopener">Lume</a> project.
         </p>
       </footer>
     </main>
