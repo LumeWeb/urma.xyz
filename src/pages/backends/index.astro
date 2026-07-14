@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+---
+
+<Base currentPath="/backends" title="Backends">
+  <PageHeader
+    eyebrow="Section 03b"
+    title="Storage Backends"
+    description="Urma is storage-agnostic. The core protocol defines opaque JSON for location data: each backend provides its own schema and manifest types."
+  />
+
+  <section class="mb-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a
+        href="/backends/sia"
+        class="border border-[var(--color-border)] bg-[var(--color-paper)] p-6 transition-colors hover:border-[var(--color-thread)]"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <span class="material-symbols-outlined text-[28px] text-[var(--color-ink)]">storage</span>
+          <span class="label-caps text-[var(--color-thread)] border-[var(--color-thread)] px-2 py-1 border rounded-sm">Implemented</span>
+        </div>
+        <h3 class="font-[var(--font-serif)] text-xl font-medium text-[var(--color-ink)] mb-2">Sia</h3>
+        <p class="text-sm text-[var(--color-muted)]">Decentralized peer-to-peer storage network. Files are erasure-coded, encrypted, and distributed across independent hosts via smart contracts. No central access point, no gatekeepers.</p>
+      </a>
+    </div>
+  </section>
+</Base>
