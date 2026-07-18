@@ -1,0 +1,125 @@
+name: Deploy urma.xyz
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "src/**"
+      - "public/**"
+      - "astro.config.mjs"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  deployments: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy urma.xyz
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Write IndexNow key file
+        env:
+          INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY_URMA }}
+        run: |
+          if [ -z "${INDEXNOW_KEY}" ]; then
+            echo "::warning::INDEXNOW_KEY_URMA not set, skipping IndexNow"
+            exit 0
+          fi
+          printf '%s' "${INDEXNOW_KEY}" > "dist/${INDEXNOW_KEY}.txt"
+          echo "Wrote dist/${INDEXNOW_KEY}.txt"
+
+      - name: Deploy to IPFS via Pinner
+        id: deploy_pinner
+        uses: lumeweb/pinner-deploy-action@v0
+        with:
+          api-key: ${{ secrets.PINNER_API_KEY }}
+          path: dist
+          domain: urma.xyz
+          remove-previous: true
+
+      - name: Submit URLs to IndexNow
+        env:
+          INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY_URMA }}
+        run: |
+          if [ -z "${INDEXNOW_KEY}" ]; then
+            echo "::warning::INDEXNOW_KEY_URMA not set, skipping IndexNow submission"
+            exit 0
+          fi
+
+          echo "::group::Extracting URLs from sitemaps"
+
+          URL_LIST=$(mktemp)
+
+          for xml_file in dist/sitemap*.xml; do
+            [ -f "$xml_file" ] || continue
+            grep -oP '(?<=<loc>)[^<]+' "$xml_file" >> "$URL_LIST" || true
+          done
+
+          SORTED_URLS=$(sort -u "$URL_LIST" | sed '/^[[:space:]]*$/d')
+
+          if [ -z "$SORTED_URLS" ]; then
+            echo "::warning::No URLs found in sitemaps"
+            rm -f "$URL_LIST"
+            exit 0
+          fi
+
+          URL_COUNT=$(echo "$SORTED_URLS" | wc -l | tr -d ' ')
+          echo "Found ${URL_COUNT} URLs to submit"
+          echo "$SORTED_URLS"
+          echo "::endgroup::"
+
+          URL_JSON=$(echo "$SORTED_URLS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          PAYLOAD=$(jq -n \
+            --arg host "urma.xyz" \
+            --arg key "${INDEXNOW_KEY}" \
+            --argjson urlList "$URL_JSON" \
+            '{host: $host, key: $key, urlList: $urlList}')
+
+          echo "::group::Submitting to IndexNow"
+          echo "POST https://api.indexnow.org/indexnow"
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 \
+            -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$PAYLOAD" || echo "000")
+
+          echo "IndexNow response: HTTP ${HTTP_CODE}"
+
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 202 ]; then
+            echo "IndexNow submission successful"
+          elif [ "$HTTP_CODE" -eq 403 ]; then
+            echo "::error::IndexNow 403 - key file not found or key mismatch at https://urma.xyz/${INDEXNOW_KEY}.txt"
+            exit 1
+          elif [ "$HTTP_CODE" -eq 429 ]; then
+            echo "::warning::IndexNow 429 - rate limited, try again later"
+          else
+            echo "::warning::IndexNow returned HTTP ${HTTP_CODE} (expected 200/202)"
+          fi
+          echo "::endgroup::"
+
+          rm -f "$URL_LIST"
