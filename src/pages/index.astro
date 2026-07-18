@@ -4,15 +4,15 @@ import PageHeader from "../components/PageHeader.astro";
 import Callout from "../components/Callout.astro";
 ---
 
-<Base currentPath="/" title="Urma Protocol">
+<Base currentPath="/" title="Urma Protocol" description="Index where your content lives across storage networks. If one mirror goes down, find another.">
   <!-- Hero -->
   <header class="relative py-20 border-b border-border mb-20 overflow-hidden">
     <div class="relative z-10 max-w-3xl">
-      <h2 class="font-serif text-4xl md:text-6xl font-medium tracking-[-0.02em] leading-[1.1] text-ink mb-8">
-        A protocol for mirroring content across independent networks.
+      <h2 class="font-serif text-4xl md:text-6xl font-medium tracking-[-0.02em] leading-[1.1] text-ink mb-4">
+        An on-chain torrent.
       </h2>
       <p class="text-lg leading-[1.65] text-on-surface-variant max-w-2xl border-l border-border pl-4">
-        A claims-based protocol for tracing files through a web of mirrors. Connection, not storage.
+        Index where your content lives across storage networks. If one mirror goes down, find another.
       </p>
     </div>
   </header>
@@ -29,20 +29,19 @@ import Callout from "../components/Callout.astro";
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
       <div class="md:col-span-8 space-y-6">
         <p class="text-lg leading-[1.65] text-ink">
-          The philosophy of Urma is built entirely on the concept of the <strong>Connection Model</strong>.
-          Rather than concerning itself with where data is stored or how it is transmitted, Urma focuses
-          purely on providing a censorship-resistant link from a claim to a storage mirror.
+          Rather than worrying about where data is stored or how it gets there, Urma focuses on
+          keeping content findable. It maps a name to one or more places where that content lives.
         </p>
         <p class="text-ink">
-          A claim name resolves to one or more mirror locations: alternative storage sources for the
-          same content. Each mirror is an independent copy on a different storage network. Urma does not
-          verify that mirrors are byte-identical across networks. It provides the discovery mechanism:
-          given a claim, find its mirrors. Verification happens at download time, per blob, by hash.
+          Each name points to mirror locations - alternative sources for the same content. They can be on
+          the same storage network or different ones. Urma does not check that mirrors match perfectly
+          across networks. It is an index: you have a name, you get the mirrors. Any verification
+          happens when you actually download, checking hashes per chunk.
         </p>
 
         <Callout title="Note">
-          Urma does not store data. It stores <em>claims about data</em>. It is a metadata layer, not a
-          storage layer.
+          Urma doesn't store data. It stores <em>claims about where data lives</em>. Think of it as a
+          map, not a warehouse.
         </Callout>
       </div>
 
@@ -80,12 +79,11 @@ import Callout from "../components/Callout.astro";
       How It Works
     </h3>
     <p class="text-ink mb-8 max-w-2xl">
-      The protocol operates through a chain of signed claims and manifests. A publisher declares that
-      a mirror exists for a piece of content, stakes a claim on the network, and broadcasts it. No
-      one verifies the claim at broadcast time, like a torrent, the claim is an assertion. Staking
-      is an anti-spam mechanism and trust signal: it costs something to publish, which
-      raises the bar for malicious actors. Actual verification happens at download time, per blob,
-      by hash.
+      The protocol works through a chain of signed claims and manifests. A publisher says a
+      mirror exists for a piece of content, stakes a claim on the network, and broadcasts it. No
+      one checks the claim at broadcast time; it's just an assertion. Staking costs
+      something, which makes spam expensive and raises the bar for bad actors. Actual checks
+      happen at download time, per chunk, by hash.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -96,9 +94,9 @@ import Callout from "../components/Callout.astro";
         </div>
         <h4 class="font-serif text-lg font-medium text-ink mb-2">Publish</h4>
           <p class="text-sm text-muted">
-            A publisher mirrors content on a storage network, constructs the manifest pages and root
+            A publisher puts content on a storage network, builds the manifest pages and root
             pointer (backend-specific), and wraps them in an UrmaClaim. Staking the claim on-chain
-            costs something: an anti-spam mechanism and trust signal.
+            costs something: it makes spam expensive and signals the publisher has skin in the game.
           </p>
       </div>
 
@@ -109,8 +107,8 @@ import Callout from "../components/Callout.astro";
         </div>
         <h4 class="font-serif text-lg font-medium text-ink mb-2">Discover</h4>
         <p class="text-sm text-muted">
-          Clients compute the deterministic Urma name from a source claim ID and query the claimtrie
-          for all mirrors at that name.
+          Clients compute the name from a source claim ID and query the network for all mirrors at
+          that name.
         </p>
       </div>
 
@@ -137,9 +135,8 @@ import Callout from "../components/Callout.astro";
       </h3>
     </div>
 
-    <p class="text-ink max-w-[75ch] mb-6">
-      Every Urma claim is identified by a deterministic name derived from the source content's ClaimID.
-      The format is simple but precise:
+    <p class="text-ink max-w-[75ch]">
+      Every Urma name comes from a source content's ClaimID. The format is simple:
     </p>
 
     <div class="bg-ink text-code-text rounded p-4 inline-block mb-6">
@@ -147,9 +144,9 @@ import Callout from "../components/Callout.astro";
     </div>
 
     <p class="text-ink max-w-[75ch]">
-      The <code>u-</code> prefix designates the resource as a native Urma entity. The payload is a
-      40-character lowercase hex encoding of the 20-byte source ClaimID. Clients compute this name
-      from content they already discovered, then query for all Urma claims at that name.
+      The <code>u-</code> prefix marks this as an Urma name. The rest is a 40-character hex encoding
+      of the 20-byte source ClaimID. Clients compute this from content they already know about, then
+      look up all mirrors registered to that name.
     </p>
   </section>
 </Base>
